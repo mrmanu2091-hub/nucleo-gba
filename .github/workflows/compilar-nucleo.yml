@@ -1,0 +1,32 @@
+name: Compilar nucleo GBA con cable
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Descargar codigo fuente
+        run: git clone --depth 1 -c core.autocrlf=false https://github.com/thenick775/mgba.git mgba-build
+      - name: Aplicar parche del cable
+        run: node compilar-en-github/cable-nucleo/aplicar-parche.js mgba-build
+      - name: Compilar
+        run: docker run --rm -v "$PWD/mgba-build:/home/mgba/src" mgba/wasm
+      - name: Verificar y empaquetar
+        run: |
+          sudo chown -R "$USER" mgba-build || true
+          OUT=mgba-build/build-wasm/wasm
+          test -f "$OUT/mgba.js" && test -f "$OUT/mgba.wasm" || { echo "Faltan mgba.js / mgba.wasm"; exit 1; }
+          grep -q netlinkStart "$OUT/mgba.js" || { echo "No trae el cable"; exit 1; }
+          mkdir -p core
+          cp "$OUT/mgba.js" "$OUT/mgba.wasm" core/
+          [ -f "$OUT/mgba.data" ] && cp "$OUT/mgba.data" core/ || true
+          echo '{"js":"mgba.js","wasm":"mgba.wasm","version":"custom-cable","threads":true,"cable":true}' > core/manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: core
+          path: core/
