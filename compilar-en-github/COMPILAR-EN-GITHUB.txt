@@ -1,0 +1,16 @@
+COMPILAR EL NÚCLEO CON CABLE SIN INSTALAR NADA (ni Docker ni Git)
+Se hace en la web de GitHub, gratis, una sola vez (tarda 10-30 min en la nube).
+
+1) Entra a https://github.com y crea una cuenta (o inicia sesión).
+2) Arriba a la derecha: «+» → «New repository». Nombre: nucleo-gba. Público o privado, da igual. «Create repository».
+3) En el repositorio nuevo: «uploading an existing file». Arrastra DENTRO la carpeta «cable-nucleo» y la carpeta «.github»
+   (están en el zip del proyecto; si tu sistema oculta «.github», usa el zip «compilar-en-github.zip» y descomprímelo primero).
+   Pulsa «Commit changes».
+4) Pestaña «Actions» → «Compilar nucleo GBA con cable» → «Run workflow» → «Run workflow».
+   (Si pide habilitar Actions, acepta.)
+5) Espera a que salga la palomita verde ✓. Entra a esa ejecución, baja hasta «Artifacts» y descarga «core».
+6) Descomprime «core» y copia sus archivos (mgba.js, mgba.wasm, manifest.json…) en:
+   public/apps/gba2091/core/      (si ya hay otros ahí, reemplázalos)
+7) Sube la web como siempre (SUBIR-TODO.bat). Listo: el cable Link ya funciona.
+
+Si sale una X roja: abre el paso que falló y mándame una captura del final del texto.
